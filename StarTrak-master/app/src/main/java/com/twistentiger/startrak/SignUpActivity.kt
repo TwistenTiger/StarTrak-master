@@ -14,16 +14,14 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseUser
 
 @Suppress("NAME_SHADOWING")
-class SignUpActivity : AppCompatActivity()
-{
+class SignUpActivity : AppCompatActivity() {
     private lateinit var emailEdit: TextInputEditText
     private lateinit var passwordEdit: TextInputEditText
     private lateinit var progressBar: ProgressBar
 
     private lateinit var mAuth: FirebaseAuth
 
-    override fun onCreate(savedInstanceState: Bundle?)
-    {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_up)
 
@@ -40,39 +38,36 @@ class SignUpActivity : AppCompatActivity()
         }
 
         signInPrompt.setOnClickListener {
-            val signInPromptIntent = Intent(this@SignUpActivity,
-                SignInActivity::class.java)
+            val signInPromptIntent = Intent(
+                this@SignUpActivity,
+                SignInActivity::class.java
+            )
 
             this@SignUpActivity.startActivity(signInPromptIntent)
         }
     }
 
-    private fun registerUser()
-    {
-        val email: String =  emailEdit.text.toString().trim()
+    private fun registerUser() {
+        val email: String = emailEdit.text.toString().trim()
         val password: String = passwordEdit.text.toString().trim()
 
-        if(email.isEmpty())
-        {
+        if (email.isEmpty()) {
             emailEdit.error = "Required"
             return
         }
 
-        if(!Patterns.EMAIL_ADDRESS.matcher(email).matches())
-        {
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             emailEdit.error = "Please enter a valid email"
             emailEdit.requestFocus()
             return
         }
 
-        if(password.isEmpty())
-        {
+        if (password.isEmpty()) {
             passwordEdit.error = "Required"
             return
         }
 
-        if(password.length < 6)
-        {
+        if (password.length < 6) {
             passwordEdit.error = "Minimum length of password should be 6"
             passwordEdit.requestFocus()
             return
@@ -81,37 +76,39 @@ class SignUpActivity : AppCompatActivity()
         progressBar.visibility = View.VISIBLE
 
         mAuth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this){ task ->
+            .addOnCompleteListener(this) { task ->
                 progressBar.visibility = View.GONE
-                if(task.isSuccessful) //if task is successful, do the following code
+                if (task.isSuccessful) //if task is successful, do the following code
                 {
                     //send verification email when successful
-                    mAuth.currentUser!!.sendEmailVerification().addOnCompleteListener{task ->
-                        if(task.isSuccessful)
-                        {
+                    mAuth.currentUser!!.sendEmailVerification().addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
                             updateUI(mAuth.currentUser)
 
-                            Toast.makeText(applicationContext,
+                            Toast.makeText(
+                                applicationContext,
                                 "Registration Successful. Check email for verification",
-                                Toast.LENGTH_LONG).show()
-                        }
-                        else
-                        {
-                            Toast.makeText(applicationContext, task.exception?.message, Toast.LENGTH_LONG).show()
+                                Toast.LENGTH_LONG
+                            ).show()
+                        } else {
+                            Toast.makeText(
+                                applicationContext,
+                                task.exception?.message,
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
                     }
-                }
-                else
-                {
-                    if(task.exception is FirebaseAuthUserCollisionException)
-                    {
-                        Toast.makeText(applicationContext,
-                            "This account already exists", Toast.LENGTH_SHORT).show()
-                    }
-                    else
-                    {
-                        Toast.makeText(applicationContext,
-                            task.exception!!.message, Toast.LENGTH_SHORT).show()
+                } else {
+                    if (task.exception is FirebaseAuthUserCollisionException) {
+                        Toast.makeText(
+                            applicationContext,
+                            "This account already exists", Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        Toast.makeText(
+                            applicationContext,
+                            task.exception!!.message, Toast.LENGTH_SHORT
+                        ).show()
 
                         updateUI(null)
                     }
@@ -119,23 +116,23 @@ class SignUpActivity : AppCompatActivity()
             }
     }
 
-    private fun updateUI(user: FirebaseUser?)
-    {
+    private fun updateUI(user: FirebaseUser?) {
         //if the user is not null we move to activity
         //else get. there must be an else
-        if(user != null)
-        {
-            val signUpIntent = Intent(this@SignUpActivity,
-                MainActivity::class.java)
+        if (user != null) {
+            val signUpIntent = Intent(
+                this@SignUpActivity,
+                MainActivity::class.java
+            )
 
             signUpIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             this@SignUpActivity.startActivity(signUpIntent)
-        }
-        else
-        {
-            Toast.makeText(applicationContext,
+        } else {
+            Toast.makeText(
+                applicationContext,
                 "Invalid operation contact developer at twistentiger@gmail.com",
-                Toast.LENGTH_LONG).show()
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 }
